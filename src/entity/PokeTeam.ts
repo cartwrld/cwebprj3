@@ -3,6 +3,19 @@ import { IsOptional, Length, IsPositive } from 'class-validator'
 
 @Entity()
 export class PokeTeam {
+  // @ts-expect-error
+  constructor (teamID?: number, teamName: string, poke1: number, poke2?: number,
+    poke3?: number, poke4?: number, poke5?: number, poke6?: number) {
+    this.teamID = teamID
+    this.teamName = teamName
+    this.poke1 = poke1 || null
+    this.poke2 = poke2 || null
+    this.poke3 = poke3 || null
+    this.poke4 = poke4 || null
+    this.poke5 = poke5 || null
+    this.poke6 = poke6 || null
+  }
+
   @PrimaryGeneratedColumn()
   @IsOptional()
     teamID: number
