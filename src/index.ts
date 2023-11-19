@@ -103,36 +103,25 @@ AppDataSource.initialize().then(async () => {
     }
   }
 
-  async function generatePokeTeamEntries (): Promise<void> {
-    const pokeTeamNames1 = [
-      'Nebula Nomads',
-      'Shadow Syndicate',
-      'Quantum Questers',
-      'Phantom Phalanx',
-      'Rune Raiders',
-      'Blaze Battalion'
-    ]
-    const pokeTeams = []
-
-    pokeTeams.push(new PokeTeam(1, 'Ash Ketchum OGs', 25, 12, 18, 1, 6, 7))
-
-    for (const team of pokeTeamNames1) {
-      const randPokes = Array.from({ length: 6 }, () => Math.floor(Math.random() * (1009 - 1) + 1))
-      pokeTeams.push(new PokeTeam(
-        null, team, randPokes[0], randPokes[1],
-        randPokes[2], randPokes[3], randPokes[4], randPokes[5]))
-    }
-    for (const team of pokeTeams) {
-      // adding premade item to the db
-      await AppDataSource.manager.save(
-        // create an entry in PokeTeam table, based on the pokeTeamObj
-        AppDataSource.manager.create(PokeTeam, team)
-      )
-    }
+  const pokeTeamObj = {
+    teamName: 'Ash Ketchum OGs',
+    poke1: 25,
+    poke2: 12,
+    poke3: 18,
+    poke4: 1,
+    poke5: 6,
+    poke6: 7
   }
-  await generatePokeTeamEntries()
 
-  await fetchPokemonForDB() // <----- don't uncomment, will add 1144 rows to the db
+  // adding premade item to the db
+  await AppDataSource.manager.save(
+    // create an entry in PokeTeam table, based on the pokeTeamObj
+    AppDataSource.manager.create(PokeTeam, pokeTeamObj)
+  )
+
+  // await fetchPokemonForDB() // <----- don't uncomment, will add 1144 rows to the db
 
   console.log('Open http://localhost:' + port + '/users to see results')
+  console.log('Open http://localhost:' + port + '/pokemon to see results')
+  console.log('Open http://localhost:' + port + '/poketeam to see results')
 }).catch(error => console.log(error))

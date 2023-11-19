@@ -1,21 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
-import {
-  IsOptional,
-  Length,
-  IsNotEmpty,
-  IsIn,
-  IsPositive,
-  Max,
-  MinLength,
-  Min,
-  Equals,
-  isUppercase
-} from 'class-validator'
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { IsOptional, Length, IsNotEmpty, IsIn, IsPositive, Max, Min, IsUrl } from 'class-validator'
 
 const POKE_TYPES = ['', 'normal', 'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison', 'ground',
   'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
 
 @Entity()
+@Unique('unique_pokemon_pokeid', ['pokeID'])
 export class Pokemon {
   /**
    *
@@ -90,12 +80,13 @@ export class Pokemon {
       case pokeNum >= 1010:
         pokeGen = 10
         break
-      // default: throw new Error('Unsuccessful in setting PokeGen ---> pokeNum was undefined')
+        // default: throw new Error('Unsuccessful in setting PokeGen ---> pokeNum was undefined')
     }
     return pokeGen
   }
 
   @PrimaryGeneratedColumn()
+
   @IsOptional()
     pokeID: number
 
@@ -114,7 +105,6 @@ export class Pokemon {
     pokeType2: string
 
   @Column('int', { nullable: false })
-  @Equals(0, { message: 'You must be a programmer...' })
   @Max(10, { message: 'Gen 10 is the latest generation!' })
   @Min(1, { message: 'Gen 1 was the first generation!' })
     gen: number
@@ -151,6 +141,6 @@ export class Pokemon {
     spd: number
 
   @Column('nvarchar', { length: 25, nullable: false })
-  @MinLength(3, { message: 'Must be a URL or a local file path' })
+  @IsUrl()
     sprite: string
 }
