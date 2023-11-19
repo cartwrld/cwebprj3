@@ -139,8 +139,6 @@ AppDataSource.initialize().then(async () => {
     }
   }
 
-  await generatePokeTeamEntries()
-
   // await fetchPokemonForDB() // <----- don't uncomment, will add 1000+ rows to the pokemon table
   await generatePokeTeamEntries() // <----- will add 6 rows to the poke_team table
 

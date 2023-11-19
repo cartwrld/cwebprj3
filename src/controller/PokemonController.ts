@@ -6,6 +6,9 @@ import { Controller } from '../decorator/Controller'
 import { Route } from '../decorator/Route'
 import { validate, ValidationError, ValidatorOptions } from 'class-validator'
 import { User } from '../entity/User'
+import { Authenticate } from '../utils/AuthUtils'
+
+const auth = new Authenticate()
 
 @Controller('/pokemon')
 export default class PokemonController {
@@ -18,51 +21,9 @@ export default class PokemonController {
     validationError: { target: false, value: false }
   }
 
-  async generalAuth (req: Request, res: Response): Promise<User> {
-    const token = req.header('Authorization')?.replace('Bearer ', '')
-    console.log('This is the token ' + token)
-    let user = new User()
-    if (token) {
-      user = await this.userRepo.findOneBy({ token })
-      if (!user) {
-        return res.status(401).json({ error: 'token does not exist' })
-      }
-    } else {
-      return res.status(401).json({ error: 'token does not exist' })
-    }
-    console.log('\nUsername |  Method  | Access Lvl  ')
-    console.log('---------|----------|-------------')
-
-    console.log(`${user.username}\t |  ${req.method}\t|   ${user.accessLevel}`)
-
-    return user
-  }
-
-  async actionAuth (req: Request, res: Response, method): Promise<User> {
-    const user = await this.generalAuth(req, res)
-
-    if (user.accessLevel === 'READ') {
-      return res.status(401).json({ error: 'user does not have permission' })
-    }
-
-    switch (method) {
-      case 'delete' :
-        return user.accessLevel === 'ADMIN'
-          ? user
-          : res.status(401).json({ error: 'user does not have permission' })
-      case 'post':
-      case 'put' :
-        return user.accessLevel === 'ADMIN' || user.accessLevel === 'WRITE'
-          ? user
-          : res.status(401).json({ error: 'user does not have permission' })
-    }
-
-    return user
-  }
-
   @Route('get', '/:pokeID*?')
   async read (req: Request, res: Response, next: NextFunction): Promise<Pokemon | Pokemon[]> {
-    if (await this.generalAuth(req, res)) {
+    if (await auth.generalAuth(req, res)) {
       if (req.params.pokeID) {
         return await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
       }
@@ -84,7 +45,7 @@ export default class PokemonController {
 
   @Route('post')
   async create (req: Request, res: Response, next: NextFunction): Promise<Pokemon | ValidationError[]> {
-    await this.actionAuth(req, res, 'post')
+    await auth.actionAuth(req, res, 'post')
 
     const newPokemon = Object.assign(new Pokemon(), req.body)
     const violations = await validate(newPokemon, this.validOptions)
@@ -98,7 +59,7 @@ export default class PokemonController {
 
   @Route('delete', '/:pokeID')
   async delete (req: Request, res: Response, next: NextFunction): Promise<Pokemon> {
-    await this.actionAuth(req, res, 'delete')
+    await auth.actionAuth(req, res, 'delete')
 
     const pokemonToRemove = await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
     // res.statusCode = 204 --No Content - browser will complain since we are actually returning content
@@ -108,7 +69,7 @@ export default class PokemonController {
 
   @Route('put', '/:pokeID')
   async update (req: Request, res: Response, next: NextFunction): Promise<Pokemon | ValidationError[]> {
-    await this.actionAuth(req, res, 'put')
+    await auth.actionAuth(req, res, 'put')
 
     const pokemonToUpdate = await this.pokemonRepo.preload(req.body)
     if (!pokemonToUpdate || pokemonToUpdate.pokeID.toString() !== req.params.pokeID) next() // pass the buck until 404 error is sent
