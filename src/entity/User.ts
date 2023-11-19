@@ -8,15 +8,15 @@ export class User {
     id: number
 
   @Column({ type: 'nvarchar', length: 50 })
-  @Length(1, 50, { message: 'First Name must be from $constraint1 to $constraint2 characters ' })
-  @IsNotEmpty({ message: 'First Name is required' })
-    firstName: string
+  @Length(1, 50, { message: 'Username must be from $constraint1 to $constraint2 characters ' })
+  @IsNotEmpty({ message: 'Username is required' })
+    username: string
 
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
-  @MaxLength(50, { message: 'Last Name can be at most $constraint1 characters' })
-  @IsOptional()
-    lastName: string
+  @Column({ type: 'nvarchar', length: 50 })
+  @IsNotEmpty({ message: 'Token is required' })
+    token: string
 
-  @Column({ type: 'integer', width: 3 })
-    age: number
+  @Column({ type: 'nvarchar', length: 50 })
+  @IsNotEmpty({ message: 'Access Level is required' })
+    accessLevel: string
 }
