@@ -19,10 +19,7 @@ export class PokeTeam {
   @IsOptional()
     teamID: number
 
-  @Column('nvarchar', {
-    length: 35,
-    nullable: false
-  })
+  @Column('nvarchar', { length: 35, nullable: false })
   @Length(1, 50, { message: 'Team Name must be from $constraint1 to $constraint2 characters' })
     teamName: string
 

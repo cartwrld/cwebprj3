@@ -32,6 +32,10 @@ export class Pokemon {
    * @param sprite : <string>
    *
    */
+  constructor ()
+
+  constructor (id: number, name: string, t1: string, t2: string, hp: number, atk: number, def: number, spatk: number,
+    spdef: number, spd: number, sprite: string)
 
   constructor (id?: number, name?: string, t1?: string, t2?: string, hp?: number, atk?: number, def?: number,
     spatk?: number, spdef?: number, spd?: number, sprite?: string) {
@@ -59,7 +63,7 @@ export class Pokemon {
       case pokeNum <= 151:
         pokeGen = 1
         break
-      case pokeNum >= 152 && pokeNum < 252:
+      case pokeNum >= 151 && pokeNum < 252:
         pokeGen = 2
         break
       case pokeNum >= 252 && pokeNum < 387:
@@ -71,17 +75,20 @@ export class Pokemon {
       case pokeNum >= 495 && pokeNum < 650:
         pokeGen = 5
         break
-      case pokeNum >= 650 && pokeNum < 810:
+      case pokeNum >= 650 && pokeNum < 722:
         pokeGen = 6
         break
-      case pokeNum >= 810 && pokeNum < 906:
+      case pokeNum >= 722 && pokeNum < 810:
         pokeGen = 7
         break
-      case pokeNum >= 906 && pokeNum < 1022:
+      case pokeNum >= 810 && pokeNum < 906:
         pokeGen = 8
         break
-      case pokeNum >= 1022:
+      case pokeNum >= 906 && pokeNum < 1017:
         pokeGen = 9
+        break
+      case pokeNum >= 1010:
+        pokeGen = 10
         break
       // default: throw new Error('Unsuccessful in setting PokeGen ---> pokeNum was undefined')
     }
