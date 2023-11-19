@@ -1,22 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
-import { IsNotEmpty, IsOptional, Length, MaxLength } from 'class-validator'
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn } from 'typeorm'
+import { IsIn, IsNotEmpty, Length } from 'class-validator'
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  @IsOptional()
-    id: number
+  @PrimaryColumn({ type: 'nvarchar', length: 20 })
+  @Length(1, 20, { message: 'Username must be from $constraint1 to $constraint2 characters' })
+  @IsNotEmpty({ message: 'Username is required' })
+    username: string
 
-  @Column({ type: 'nvarchar', length: 50 })
-  @Length(1, 50, { message: 'First Name must be from $constraint1 to $constraint2 characters ' })
-  @IsNotEmpty({ message: 'First Name is required' })
-    firstName: string
+  @Column({ type: 'nvarchar', length: 50, nullable: false })
+  @Length(1, 50, { message: 'Password must be from $constraint1 to $constraint2 characters' })
+  @IsNotEmpty({ message: 'Password is required' })
+    password: string
 
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
-  @MaxLength(50, { message: 'Last Name can be at most $constraint1 characters' })
-  @IsOptional()
-    lastName: string
+  @Column({ type: 'nvarchar', nullable: false })
+  @IsNotEmpty({ message: 'You are not have privileges to perform this action!' })
+    authtoken: string
 
-  @Column({ type: 'integer', width: 3 })
-    age: number
+  @Column({ type: 'nvarchar', length: 20 })
+  @IsIn(['admin', 'trainer'])
+  @IsNotEmpty({ message: 'Role is required' })
+    role: string // This field represents the user's role (e.g., 'admin', 'pokeuser')
 }

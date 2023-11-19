@@ -32,10 +32,6 @@ export class Pokemon {
    * @param sprite : <string>
    *
    */
-  constructor ()
-
-  constructor (id: number, name: string, t1: string, t2: string, hp: number, atk: number, def: number, spatk: number,
-    spdef: number, spd: number, sprite: string)
 
   constructor (id?: number, name?: string, t1?: string, t2?: string, hp?: number, atk?: number, def?: number,
     spatk?: number, spdef?: number, spd?: number, sprite?: string) {

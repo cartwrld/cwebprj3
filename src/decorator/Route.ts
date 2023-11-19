@@ -15,7 +15,8 @@ export const Route = (method = 'get', param = ''): MethodDecorator => {
     routes.push({
       method,
       param,
-      action: propertyKey
+      action: propertyKey,
+      protected: true
     })
     Reflect.defineMetadata('routes', routes, target.constructor)
   }

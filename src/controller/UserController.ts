@@ -14,9 +14,9 @@ export class UserController {
     return await this.userRepository.find()
   }
 
-  @Route('get', '/:id')
+  @Route('get', '/:username')
   async one (req: Request, response: Response, next: NextFunction): Promise<User> {
-    return await this.userRepository.findOneBy({ id: req.params.id })
+    return await this.userRepository.findOneBy({ username: req.params.username })
   }
 
   // typescript - private property fully typed object
@@ -30,7 +30,7 @@ export class UserController {
     const newUser = Object.assign(new User(), req.body)
     const violations = await validate(newUser)
     if (violations.length) { // errors exist - don't save to db - return status code and the errors
-      res.statuscode = 422 // Unprocessable Entity
+      res.statusCode = 422 // Unprocessable Entity
       return violations
     } else {
       return await this.userRepository.save(newUser)
@@ -39,7 +39,7 @@ export class UserController {
 
   @Route('delete', '/:id')
   async remove (req: Request, res: Response, next: NextFunction): Promise<User> {
-    const userToRemove = await this.userRepository.findOneBy({ id: req.params.id })
+    const userToRemove = await this.userRepository.findOneBy({ username: req.params.username })
     return await this.userRepository.remove(userToRemove)
   }
 }

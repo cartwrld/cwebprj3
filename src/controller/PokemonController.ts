@@ -1,6 +1,6 @@
 import { Like } from 'typeorm'
 import { AppDataSource } from '../data-source'
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Request, Response, NextFunction, Request, Response } from 'express'
 import { Pokemon } from '../entity/Pokemon'
 import { Controller } from '../decorator/Controller'
 import { Route } from '../decorator/Route'
@@ -10,7 +10,6 @@ import { validate, ValidationError, ValidatorOptions } from 'class-validator'
 export default class PokemonController {
   private readonly pokemonRepo = AppDataSource.getRepository(Pokemon)
 
-  // https://github.com/typestack/class-validator#passing-options
   private readonly validOptions: ValidatorOptions = {
     stopAtFirstError: true,
     skipMissingProperties: false,
@@ -24,10 +23,7 @@ export default class PokemonController {
       const findOptions: any = { order: {} } // prepare order and where props
       const existingFields = this.pokemonRepo.metadata.ownColumns.map((col) => col.propertyName)
 
-      // create a where clause ARRAY to eventually add to the findOptions
-      // you must also use Like ('% ... %')
-      // only add it to the findOptions IF searchwherelike query string is provided
-
+      // @ts-expect-error
       const sortField: string = existingFields.includes(req.query.sortby) ? req.query.sortby : 'pokeID'
       findOptions.order[sortField] = req.query.reverse ? 'DESC' : 'ASC'
       // findOption looks like { order{ phone: 'DESC' } }
@@ -55,7 +51,7 @@ export default class PokemonController {
     const violations = await validate(newPokemon, this.validOptions)
     if (violations.length) {
       res.statusCode = 422 // Unprocessable Entity
-      return violationsv
+      return violations
     } else {
       return await this.pokemonRepo.save(newPokemon)
     }
