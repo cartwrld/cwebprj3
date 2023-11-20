@@ -7,9 +7,9 @@ import { RouteDefinition } from './decorator/RouteDefinition'
 import * as cors from 'cors'
 import PokemonController from './controller/PokemonController'
 import PokeTeamController from './controller/PokeTeamController'
-import fetch from 'axios'
-import { Pokemon } from './entity/Pokemon'
-import { PokeTeam } from './entity/PokeTeam'
+import { PowerPoke } from './utils/PokeUtils'
+
+const pp = new PowerPoke()
 
 const port = 3004
 
@@ -74,73 +74,8 @@ AppDataSource.initialize().then(async () => {
   // start express server
   app.listen(port)
 
-  async function fetchPokemonForDB (): Promise<void> {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0') // Replace with your actual API URL
-    const data = response.data.results
-
-    const collection = []
-
-    for (const poke of data) {
-      const pokeRes = await fetch(poke.url)
-      const pokeData = pokeRes.data
-
-      collection.push(new Pokemon(
-        pokeData.id,
-        pokeData.name,
-        pokeData.types[0].type.name,
-        pokeData.types.length > 1 ? pokeData.types[1].type.name : '',
-        pokeData.stats[0].base_stat, // hp
-        pokeData.stats[1].base_stat, // atk
-        pokeData.stats[2].base_stat, // def
-        pokeData.stats[3].base_stat, // spatk
-        pokeData.stats[4].base_stat, // spdef
-        pokeData.stats[5].base_stat, // spd
-        pokeData.sprites.front_default
-      ))
-      console.log('Pushed ' + pokeData.name + 'to collection')
-    }
-    for (const pokeObj of collection) {
-      await AppDataSource.manager.save(
-        AppDataSource.manager.create(Pokemon, pokeObj)
-      )
-      console.log('Successfully added { ' + pokeObj.pokeName + ' } to database')
-    }
-  }
-
-  // const pokeTeamObj = {
-  //   teamName: 'Ash Ketchum OGs',
-  //   poke1: 25,
-  //   poke2: 12,
-  //   poke3: 18,
-  //   poke4: 1,
-  //   poke5: 6,
-  //   poke6: 7
-  // }
-  async function generatePokeTeamEntries (): Promise<void> {
-    const pokeTeamNames = [
-      'Nebula Nomads', 'Shadow Syndicate', 'Quantum Questers',
-      'Phantom Phalanx', 'Rune Raiders', 'Blaze Battalion'
-    ]
-    const pokeTeams = []
-    pokeTeams.push(new PokeTeam(1, 'Ash Ketchum OGs', 25, 12, 18, 1, 6, 7))
-
-    for (const team of pokeTeamNames) {
-      const randPokes = Array.from({ length: 6 }, () => Math.floor(Math.random() * (1009 - 1) + 1))
-      pokeTeams.push(new PokeTeam(
-        null, team, randPokes[0], randPokes[1],
-        randPokes[2], randPokes[3], randPokes[4], randPokes[5]))
-    }
-    for (const team of pokeTeams) {
-      // adding premade item to the db
-      await AppDataSource.manager.save(
-        // create an entry in PokeTeam table, based on the pokeTeamObj
-        AppDataSource.manager.create(PokeTeam, team)
-      )
-    }
-  }
-
-  // await fetchPokemonForDB() // <----- don't uncomment, will add 1000+ rows to the pokemon table
-  await generatePokeTeamEntries() // <----- will add 6 rows to the poke_team table
+  // await pp.fetchPokemonForDB() // <----- don't uncomment, will add 1000+ rows to the pokemon table
+  await pp.generatePokeTeamEntries() // <----- will add 7 rows to the poke_team table
 
   console.log('Open http://localhost:' + port + '/users to see results')
   console.log('Open http://localhost:' + port + '/pokemon to see results')

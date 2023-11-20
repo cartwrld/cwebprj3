@@ -5,7 +5,6 @@ import { Pokemon } from '../entity/Pokemon'
 import { Controller } from '../decorator/Controller'
 import { Route } from '../decorator/Route'
 import { validate, ValidationError, ValidatorOptions } from 'class-validator'
-import { User } from '../entity/User'
 import { Authenticate } from '../utils/AuthUtils'
 
 const auth = new Authenticate()
@@ -13,7 +12,6 @@ const auth = new Authenticate()
 @Controller('/pokemon')
 export default class PokemonController {
   private readonly pokemonRepo = AppDataSource.getRepository(Pokemon)
-  private readonly userRepo = AppDataSource.getRepository(User)
 
   private readonly validOptions: ValidatorOptions = {
     stopAtFirstError: true,
@@ -21,8 +19,17 @@ export default class PokemonController {
     validationError: { target: false, value: false }
   }
 
+  /**
+   * This function ensures the user is authorized to retrieve entries, as well as retrieves
+   * Pokemon data from the database when a GET request is made. It handles user authorization
+   * and returns either a single Pokemon or a list of Pokemon based on the request.
+   *
+   * @param req {Request} the request
+   * @param res {Response} the response
+   * @returns {Promise<Pokemon | Pokemon[]>} a Pokemon or array of Pokemon.
+   */
   @Route('get', '/:pokeID*?')
-  async read (req: Request, res: Response, next: NextFunction): Promise<Pokemon | Pokemon[]> {
+  async read (req: Request, res: Response): Promise<Pokemon | Pokemon[]> {
     if (await auth.generalAuth(req, res)) {
       if (req.params.pokeID) {
         return await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
@@ -43,8 +50,17 @@ export default class PokemonController {
     }
   }
 
+  /**
+   * This function is responsible ensuring the user is authorized to create entries, as well
+   * as creating a new Pokemon entry in the database when a POST request containing
+   * details for a Pokemon is made.
+   *
+   * @param req {Request} the request
+   * @param res {Response} the response
+   * @returns {Promise<Pokemon | ValidationError[]>
+   */
   @Route('post')
-  async create (req: Request, res: Response, next: NextFunction): Promise<Pokemon | ValidationError[]> {
+  async create (req: Request, res: Response): Promise<Pokemon | ValidationError[]> {
     await auth.actionAuth(req, res, 'post')
 
     const newPokemon = Object.assign(new Pokemon(), req.body)
@@ -57,16 +73,16 @@ export default class PokemonController {
     }
   }
 
-  @Route('delete', '/:pokeID')
-  async delete (req: Request, res: Response, next: NextFunction): Promise<Pokemon> {
-    await auth.actionAuth(req, res, 'delete')
-
-    const pokemonToRemove = await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
-    // res.statusCode = 204 --No Content - browser will complain since we are actually returning content
-    if (pokemonToRemove) return await this.pokemonRepo.remove(pokemonToRemove)
-    else next()
-  }
-
+  /**
+   * This function is responsible for ensuring the user is authorized to update entries, as well
+   * as updating a Pokemon entry in the database when a PUT request containing
+   * updated details for a Pokemon is made.
+   *
+   * @param req {Request} the request
+   * @param res {Response} the response
+   * @param next {NextFunction} the next function
+   * @returns {Promise<Pokemon | ValidationError[]>} either your updated Pokemon or a list of validation errors
+   */
   @Route('put', '/:pokeID')
   async update (req: Request, res: Response, next: NextFunction): Promise<Pokemon | ValidationError[]> {
     await auth.actionAuth(req, res, 'put')
@@ -81,5 +97,25 @@ export default class PokemonController {
       }
       return await this.pokemonRepo.save(pokemonToUpdate)
     }
+  }
+
+  /**
+   * This function is responsible for ensuring the user is authorized to delete entries, as well
+   * as removing a Pokemon entry from the database when a DELETE request targeting
+   * a specific Pokemon is made.
+   *
+   * @param req {Request} the request
+   * @param res {Response} the response
+   * @param next {NextFunction} the next function
+   * @returns {Promise<Pokemon | ValidationError[]>} either your deleted Pokemon or a list of validation errors.
+   */
+  @Route('delete', '/:pokeID')
+  async delete (req: Request, res: Response, next: NextFunction): Promise<Pokemon> {
+    await auth.actionAuth(req, res, 'delete')
+
+    const pokemonToRemove = await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
+    // res.statusCode = 204 --No Content - browser will complain since we are actually returning content
+    if (pokemonToRemove) return await this.pokemonRepo.remove(pokemonToRemove)
+    else next()
   }
 }

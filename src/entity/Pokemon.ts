@@ -7,26 +7,31 @@ const POKE_TYPES = ['', 'normal', 'fire', 'water', 'grass', 'electric', 'ice', '
 @Entity()
 @Unique('unique_pokemon_pokeid', ['pokeID'])
 export class Pokemon {
-  /**
-   *
-   * @param id : <number>
-   * @param name : <string>
-   * @param t1 : <string>
-   * @param t2 : <string>
-   * @param hp : <number>
-   * @param atk : <number>
-   * @param def : <number>
-   * @param spatk : <number>
-   * @param spdef : <number>
-   * @param spd : <number>
-   * @param sprite : <string>
-   *
-   */
   constructor ()
 
+  /**
+   * Represents a Pokemon with attributes:
+   *
+   * @param id {number} unique identifier
+   * @param name {string} name
+   * @param t1 {string} primary type
+   * @param t2 {string} secondary type
+   * @param hp {number} hit points (HP)
+   * @param atk {number} attack stat
+   * @param def {number} defense stat
+   * @param spatk {number} special attack stat
+   * @param spdef {number} special defense stat
+   * @param spd {number} speed stat
+   * @param sprite {string} sprite image URL or path
+   */
   constructor (id: number, name: string, t1: string, t2: string, hp: number, atk: number, def: number, spatk: number,
     spdef: number, spd: number, sprite: string)
 
+  /**
+   * Used for individual values that were missing when building the database.
+   * For dealing with Pokemon retrieved from the initial PokeAPI call that didn't
+   * have all the required information.
+   */
   constructor (id?: number, name?: string, t1?: string, t2?: string, hp?: number, atk?: number, def?: number,
     spatk?: number, spdef?: number, spd?: number, sprite?: string) {
     this.pokeID = id
@@ -44,7 +49,7 @@ export class Pokemon {
   }
 
   /**
-   * Function for setting setting the Generation of the Pokemon based on the ID
+   * Function for setting the Generation of the Pokemon based on the ID
    */
   private static setPokeGen (pokeid): number {
     const pokeNum = pokeid
@@ -80,13 +85,11 @@ export class Pokemon {
       case pokeNum >= 1010:
         pokeGen = 10
         break
-        // default: throw new Error('Unsuccessful in setting PokeGen ---> pokeNum was undefined')
     }
     return pokeGen
   }
 
   @PrimaryGeneratedColumn()
-
   @IsOptional()
     pokeID: number
 
