@@ -107,9 +107,7 @@ export default class PokeTeamController {
    * as removing a PokeTeam entry from the database when a DELETE request targeting
    * a specific PokeTeam is made.
    *
-   * @param req {Request} the request
-   * @param res {Response} the response
-   * @param next {NextFunction} the next function
+
    * @returns {Promise<PokeTeam | ValidationError[]>} either your deleted PokeTeam or a list of validation errors.
    */
   @Route('delete', '/:teamID')

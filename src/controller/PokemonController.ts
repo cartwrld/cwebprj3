@@ -32,6 +32,7 @@ export default class PokemonController {
   async read (req: Request, res: Response): Promise<Pokemon | Pokemon[]> {
     if (await auth.generalAuth(req, res)) {
       if (req.params.pokeID) {
+        await this.pokemonRepo.find({ where: req.params() })
         return await this.pokemonRepo.findOneBy({ pokeID: req.params.pokeID })
       }
       const findOptions: any = { order: {} }
